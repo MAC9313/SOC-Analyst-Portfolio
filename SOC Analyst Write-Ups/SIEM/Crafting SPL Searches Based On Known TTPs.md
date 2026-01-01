@@ -9,27 +9,27 @@ index="main" sourcetype="WinEventLog:Sysmon" EventCode=1 Image=*\\ipconfig.exe O
 | stats count by Image,CommandLine 
 | sort - count
 ```
-![](./attachments/Pasted%20image%2020251228175515.png)
+![](../attachments/Pasted%20image%2020251228175515.png)
 ### Detection Of Requesting Malicious Payloads/Tools Hosted On Reputable/Whitelisted Domains (Such As githubusercontent.com)
 Attackers often utilize GitHub as a hosting platform for their payloads, therefore monitoring for this network traffic can result in good findings.
 ```
 index="main" sourcetype="WinEventLog:Sysmon" EventCode=22  QueryName="*github*" | stats count by Image, QueryName
 ```
-![](./attachments/Pasted%20image%2020251228180230.png)
+![](../attachments/Pasted%20image%2020251228180230.png)
 
 `Dig Deeper Into Activity Being Performed On GitHub`
 ```SPL
 index="main" sourcetype="WinEventLog:Sysmon" EventCode=1 "*github*" 
 | stats count by _time, User, Image, CommandLine
 ```
-![](./attachments/Pasted%20image%2020251228180623.png)
+![](../attachments/Pasted%20image%2020251228180623.png)
 Further research shows that https://github.com/l4rm4nd/ is a repository containing hacking tools, therefore further investigation is needed. 
 `By Simply Looking Into The Event, Adding A Time Range Of 5+ Hours, And Modifying The Query, We're Able To Get Some Valuable Output`
 ```SPL
 index="main" sourcetype="WinEventLog:Sysmon" EventCode=1
 | stats count by _time, Image, CommandLine
 ```
-![](./attachments/Pasted%20image%2020251228182226.png)
+![](../attachments/Pasted%20image%2020251228182226.png)
 It can be seen that malicious events are taking place within the network and immediate containment of the affected hosts should be performed.
 ##### The Malicious Toolkit And Intent
 
@@ -44,14 +44,14 @@ It can be seen that malicious events are taking place within the network and imm
 | 12:47:18 | Data Review        | notepad.exe ...\_DCSync_NTLM_LOGFILE.txt | Critical   | Reviewing a second log file, likely containing different sets of domain credentials or the KRBTGT hash.              |
 ##### Tracking Root Cause 
 First, I tracked down the ComputerName that initiated the powershell command to GitHub.
-![](./attachments/Pasted%20image%2020251228185937.png)
+![](../attachments/Pasted%20image%2020251228185937.png)
 Next, by using Splunks built-in feature, I filtered for the events that happened within the last hour of the download. Using this query, I sorted the times from earliest to latest and looked for any process creations. 
 ```SPL
 index="main" sourcetype="WinEventLog:Sysmon" EventCode=1 ComputerName="DESKTOP-UN7T4R8.uniwaldo.local" 
 | sort _time
 | stats count by _time, Image, CommandLine
 ```
-![](./attachments/Pasted%20image%2020251228190630.png)
+![](../attachments/Pasted%20image%2020251228190630.png)
 There is a lot to be concerned with, but I decided to look into the log with the CommandLine invoking DCsync. The parent command line shows as \\10.0.0.47\C$\Windows\PSEXECSCVCS.exe. This is a major red flag as the PSExecSvcs is typosquatted to masquerade as a legitimate Windows process. A tell-tale sign of malware. 
 Also, the path: `\10.0.0.47\C\$\\Windows\\PSEXECSCVCS.exe` indicates that this executable was pushed to a machine over the network using an Administrative Share (C$).
  This is a textbook sign of Lateral Movement. An attacker who has already compromised one machine (likely 10.0.0.47) is now using stolen credentials to spread to other machines on the network.
@@ -62,14 +62,14 @@ index="main" sourcetype="wineventlog:security" "10.0.0.47"
 | rename Source_Network_Address as Source_IP, Account_Name as Compromised_Account
 | sort - last_seen
 ```
-![](./attachments/Pasted%20image%2020251228195516.png)
+![](../attachments/Pasted%20image%2020251228195516.png)
 The machine 10.0.0.253 used the account waldo to establish a network connection to the victim machine. 
 `Verify If There Are Any Strange Login Occurances Using Event Codes 4624 and 4625`
 ```SPL
 index="main" "10.0.0.253" EventCode=4624 OR EventCode=4625
 | stats count by _time, EventCode
 ```
-![](./attachments/Pasted%20image%2020251228204951.png)
+![](../attachments/Pasted%20image%2020251228204951.png)
 It can be noticed that there were 14 failed login attempts before a successful login attempt in a very short amount of time, indicating a brute force attack. It would now appear that the `10.0.0.253` machine is also compromised.
 `Look Into When 10.0.0.253 Was Compromised`
 ```SPL
@@ -77,7 +77,7 @@ index="main" DestinationIp="10.0.0.253"
 | sort _time 
 | stats count by SourceIp
 ```
-![](./attachments/Pasted%20image%2020251228205922.png)
+![](../attachments/Pasted%20image%2020251228205922.png)
 The IP Address 10.0.0.230 can be seen, as well as a broadcast address. We'll further look into the 10.0.0.230 address.
 ```SPL
 index="main" "10.0.0.230" 
@@ -90,7 +90,7 @@ index="main" "10.0.0.230" EventCode=15
 | sort _time 
 | stats count by _time, Image, TargetFilename
 ```
-![](./attachments/Pasted%20image%2020251228211605.png)
+![](../attachments/Pasted%20image%2020251228211605.png)
 Alas, it appears that we have found `Patient-Zero`, which was performed through a drive-by compromise. `Demon.dll` is the primary agent (implant) for the Havoc C2 Framework.
 
 `Havoc` is a modern, open-source Command and Control framework that has become a popular alternative to Cobalt Strike. The "Demon" agent is the part that sits on the infected machine, waits for commands from the attacker, and executes them. It is highly evasive and uses advanced techniques to bypass EDR (Endpoint Detection and Response) systems.
@@ -140,15 +140,15 @@ The rex command is extracting the filename from the `Details` field using a regu
 
 Original
 
-![](./attachments/Pasted%20image%2020251228172508.png)
+![](../attachments/Pasted%20image%2020251228172508.png)
 
 Extracted
-![](./attachments/Pasted%20image%2020251228172131.png)
+![](../attachments/Pasted%20image%2020251228172131.png)
 Take note that the rex command extracted CredentialEnrollmentManager.exe from the details section and the following eval command changed all characters to lowercase and placed the output to the file_name value.
 `| eval file_name = if(isnull(file_name),reg_file_name,(file_name)):`
 The eval command checks if the `file_name` field is null. If it is, it sets `filename` to the value of `reg_file_name`. If `file_name`is not null, then it remains the same.
 
 **Results Of The Query**
-![](./attachments/Pasted%20image%2020251228174444.png)
+![](../attachments/Pasted%20image%2020251228174444.png)
 
 ### Detection Of Utilizing Archive Files For Transferring Tools Or Data Exfiltration
