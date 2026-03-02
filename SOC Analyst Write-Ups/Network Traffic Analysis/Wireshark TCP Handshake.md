@@ -10,6 +10,7 @@ There are many types of flags:
 | Urgent(URG)          | Indicates out of band data that must be processed by the network stacks before normal data |
 | Finish(FIN)          | Gracefully terminate the TCP connection                                                    |
 | Reset(RST)           | Immediately terminate the connection and drop any-in transmit data                         |
+
 When performing packet analysis, there are some signs that a security analyst can look for to identify suspicious activity:
 1. Too many flags of the same kind can identify scanning is occurring within the network.
 2. The abnormal use of flags can indicate a TCP RST attack, hijacking, or an attempt for an intruder to stay hidden in their enumeration activities.
