@@ -49,11 +49,14 @@ union DeviceEvents, DeviceFileEvents, DeviceProcessEvents, SecurityAlert, AlertE
 ![](attachments/Pasted%20image%2020260228205517.png)
 
 At this point, it would be time to escalate the issue to SOC level 2 as it is clear that the obfuscated Powershell command reached out to a known malicious url to download a file. Furthermore, after downloading the file another Powershell command was used to silently gain persistence onto the system. In my professional opinion, the Desktop should be quarantined from the rest of the network so that any malicious processes/scheduled tasks can be removed.
+
 ### Root Cause Analysis
 First and foremost, I want to see when the SOC-Administrator account started exhibiting abnormal behavior. The initial suspicious events occurred around 02-28 12:12:54 UTC time. By looking at the timeline on Defender alerts, we see a suspicious login from an external address. 
+
 ![](attachments/Pasted%20image%2020260228232550.png)
 
 Next, querying virus total gives the following results:
+
 ![](attachments/Pasted%20image%2020260228232820.png)
 
 It is unclear whether or not the IP address is malicious in nature as it appears to be a VPN located in the UK. Further investigation is needed. However mere seconds afterwards, the remote session initiator IP of 192.168.112.129 is established.  To obtain a better look into the events that took place after the connection 192.168.112.129 initiated, the following query was executed:
@@ -70,6 +73,7 @@ AlertEvidence
 ![](attachments/Pasted%20image%2020260228213527.png)
 
 The same commands that were observed in the initial investigation appear. I decided to look up the PID of the alert to observe if it spawned any processes. The parent process id is located in the `AdditionalFields` section, therefore needs to be parsed.
+
 ![](attachments/Pasted%20image%2020260228160351.png)
 
 `Querying to view spawned processes from the powershell instances`
@@ -82,6 +86,7 @@ AlertEvidence
 ```
 
 `Querying to view the parent process of the suspicious obfuscated powershell event`
+
 ```KQL
 AlertEvidence
 | extend ParsedFields = todynamic(AdditionalFields)
@@ -134,6 +139,7 @@ union DeviceProcessEvents, DeviceFileEvents, DeviceProcessEvents, DeviceNetworkE
 ![](attachments/Pasted%20image%2020260301134540.png)
 
 Upon acquiring the file hash of New Purchaee Order 00045757.js, it was determined that the file is malicious. 
+
 ![](attachments/Pasted%20image%2020260301134954.png)
 
 Looking into events that preceded this file do not indicate that the file was downloaded from the web or an email attachment. Further investigation shows no indication of when the file originated, but the abnormal behavior where Desktop-2 reached out to the malicious domain happened after the interaction with the malicious file. This is a lab environment and files are discarded after 30 days, which may be the cause resulting in lack of telemetry for the origination of the file. Regardless, New Purchaee Order appears to be patient zero!
