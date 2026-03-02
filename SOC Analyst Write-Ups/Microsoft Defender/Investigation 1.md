@@ -153,6 +153,8 @@ AlertEvidence
 
 
 Upon detection, 
+
+
 `Query for all tables containg the javascript file`
 ```KQL
 search "New Purchaee Order 00045757.js" 
@@ -161,6 +163,7 @@ search "New Purchaee Order 00045757.js"
 
 
 `Query for events relating to the javascript file in the discovered tables`
+
 
 ```KQL
 union DeviceProcessEvents, DeviceFileEvents, DeviceProcessEvents, DeviceNetworkEvents, DeviceEvents, BehaviorEntities, SecurityAlert, AlertEvidence
