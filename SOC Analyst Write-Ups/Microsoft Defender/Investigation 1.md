@@ -174,10 +174,17 @@ union DeviceProcessEvents, DeviceFileEvents, DeviceProcessEvents, DeviceNetworkE
 ```
 
 
+
+
 ![](attachments/Pasted%20image%2020260301134540.png)
 
 
+
+
 Upon acquiring the file hash of New Purchaee Order 00045757.js, it was determined that the file is malicious. 
+
+
+
 
 
 ![](attachments/Pasted%20image%2020260301134954.png)
