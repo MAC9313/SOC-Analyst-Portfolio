@@ -22,9 +22,11 @@ Find_/_Replace({'option':'Regex','string':'jRI'},'|',true,false,true,false)
 ```
 
 The final result provided a clearer picture for the objective of the command: 
+
 ![](attachments/Pasted%20image%2020260228200307.png)
 
 Following .Replace() in the obfuscated code, the URL corresponds to `hxxp[://]144[.]172[.]100[.]220/img/optimized_MSI[.]png`, which appears to download a file named `Name_File` in the C:\Users\Public\Downloads folder. Upon further deconstruction of the encoding, this is confirmed:
+
 ![](attachments/Pasted%20image%2020260228201656.png)
 
 Further investigation through VirusTotal shows that the URL is from a known "`highly sophisticated RAT`"
@@ -32,6 +34,7 @@ Further investigation through VirusTotal shows that the URL is from a known "`hi
 ![](attachments/Pasted%20image%2020260228195744.png)
 
 Query to find more information into `name_file.js`
+
 ![](attachments/Pasted%20image%2020260228203108.png)
 
 `Query to search for events regarding name_file.js`
