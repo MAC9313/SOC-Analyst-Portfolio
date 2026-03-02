@@ -12,8 +12,8 @@ In the following analysis of `ARP_Spoof.pcapng`, we will identify how a single h
 ```Wireshark
 arp.opcode
 ```
-
 ![](../attachments/Pasted image 20251231132834.png]]
+
 At a glance, this traffic appears to be normal ARP traffic, but having a closer look shows that the source ARP request comes from host at `08:00:27:53:0C:ba | 192.168.10.5`, which subsequently starts sending ARP replies that states that `192.168.10.4` is at the `08:00:27:53:0C:ba`. This is a tell tale sign of ARP spoofing as the suspicious MAC address is telling the router to send it all communications that is destined for `192.168.10.4`
 
 `Dig Further Into The ARP Traffic`
