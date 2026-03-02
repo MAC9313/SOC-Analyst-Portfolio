@@ -183,6 +183,8 @@ Upon acquiring the file hash of New Purchaee Order 00045757.js, it was determine
 ![](attachments/Pasted%20image%2020260301134954.png)
 
 
+
+
 Looking into events that preceded this file do not indicate that the file was downloaded from the web or an email attachment. Further investigation shows no indication of when the file originated, but the abnormal behavior where Desktop-2 reached out to the malicious domain happened after the interaction with the malicious file. This is a lab environment and files are discarded after 30 days, which may be the cause resulting in lack of telemetry for the origination of the file. Regardless, New Purchaee Order appears to be patient zero!
 
 
