@@ -2,5 +2,5 @@ Greetings, over the past year, I've been studying very hard through my school cu
 
 I've created this repository for several reasons. First, I want to demonstrate to potential employers that I am a self-motivated individual who is continually working to improve my skills, regardless of whether I'm employed. Second, I want to use this repository as a learning tool for myself, as well as for others who are potentially just getting started in cybersecurity. Please be aware that I'm not an expert and I'm not claiming to be good, but I have improved immensely since I first started learning. I have a long way to go, but I'm doing my best to develop an investigative mindset and remain curious about anything that may seem unusual.
 
-Finally, I am currently in school and plan to graduate within the next five months. I will not be as active as I want to be on this repository, but I will try my best to continue adding/finishing new write-ups. Please note that my write-ups are likely an ongoing process and not yet finished, but I'll upload them when there is enough content to demonstrate the learned concepts.
+
 
