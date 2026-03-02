@@ -9,7 +9,7 @@ index="main" sourcetype="WinEventLog:Sysmon" EventCode=1 Image=*\\ipconfig.exe O
 | stats count by Image,CommandLine 
 | sort - count
 ```
-![](./attachments/Pasted%20image%2020251228175515.png)
+![](/attachments/Pasted%20image%2020251228175515.png)
 ### Detection Of Requesting Malicious Payloads/Tools Hosted On Reputable/Whitelisted Domains (Such As githubusercontent.com)
 Attackers often utilize GitHub as a hosting platform for their payloads, therefore monitoring for this network traffic can result in good findings.
 ```
