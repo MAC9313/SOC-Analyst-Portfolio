@@ -1,5 +1,6 @@
 ### Scenario
 An alert was generated from Microsoft Defender for a suspicious .NET assembly process being loaded. Using the Advanced Hunting, the investigation begins:
+
 `Querying The Alert ID`
 ```KQL
 AlertEvidence
@@ -11,6 +12,7 @@ AlertEvidence
 ![](attachments/Pasted%20image%2020260228205922.png)
 
 It was discovered that the user SOC-Administrator on Desktop2 from a remote IP connection of 192.168.112.129 initiated the command. Upon discovery of obfuscated PowerShell commands, the Base64 was decoded in CyberChef. After one round of Base64 decoding, the following find and replace algorithm was used to further break down the string:
+
 ```Recipe
 Find_/_Replace({'option':'Regex','string':'\'\\s*\\+\\s*\''},'',true,false,true,false)
 Find_/_Replace({'option':'Regex','string':'iec'},'\'',true,false,true,false)
@@ -25,7 +27,7 @@ The final result provided a clearer picture for the objective of the command:
 Following .Replace() in the obfuscated code, the URL corresponds to `hxxp[://]144[.]172[.]100[.]220/img/optimized_MSI[.]png`, which appears to download a file named `Name_File` in the C:\Users\Public\Downloads folder. Upon further deconstruction of the encoding, this is confirmed:
 ![](attachments/Pasted%20image%2020260228201656.png)
 
-Further investigation through VirusTotal shows that the URL is from a known "`highly sophisticated RAT"
+Further investigation through VirusTotal shows that the URL is from a known "`highly sophisticated RAT`"
 
 ![](attachments/Pasted%20image%2020260228195744.png)
 
