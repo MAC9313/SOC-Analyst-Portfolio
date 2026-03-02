@@ -12,6 +12,7 @@ In the following analysis of `ARP_Spoof.pcapng`, we will identify how a single h
 ```Wireshark
 arp.opcode
 ```
+
 ![](../attachments/Pasted%20image%2020251231132834.png)
 
 
