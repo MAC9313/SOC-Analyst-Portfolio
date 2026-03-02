@@ -151,4 +151,4 @@ The eval command checks if the `file_name` field is null. If it is, it sets `fil
 **Results Of The Query**
 ![](attachments/Pasted%20image%2020251228174444%201.png)
 
-### Detection Of Utilizing Archive Files For Transferring Tools Or Data Exfiltration
+
