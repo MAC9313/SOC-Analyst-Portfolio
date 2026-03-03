@@ -1,5 +1,6 @@
 ### Scenario
 An alert was generated from Microsoft Defender for a suspicious .NET assembly process being loaded. Using the Advanced Hunting, the investigation begins:
+
 `Querying The Alert ID`
 ```KQL
 AlertEvidence
@@ -7,10 +8,14 @@ AlertEvidence
 | sort by TimeGenerated desc
 | project-order TimeGenerated, ProcessCommandLine
 ```
+<br>
 
-![](Pasted%20image%2020260228205922.png)
+![](attachments/Pasted%20image%2020260228205922.png)
+
+<br>
 
 It was discovered that the user SOC-Administrator on Desktop2 from a remote IP connection of 192.168.112.129 initiated the command. Upon discovery of obfuscated PowerShell commands, the Base64 was decoded in CyberChef. After one round of Base64 decoding, the following find and replace algorithm was used to further break down the string:
+
 ```Recipe
 Find_/_Replace({'option':'Regex','string':'\'\\s*\\+\\s*\''},'',true,false,true,false)
 Find_/_Replace({'option':'Regex','string':'iec'},'\'',true,false,true,false)
@@ -18,21 +23,36 @@ Find_/_Replace({'option':'Regex','string':'p45'},'$',true,false,true,false)
 Find_/_Replace({'option':'Regex','string':'jxV'},'"',true,false,true,false)
 Find_/_Replace({'option':'Regex','string':'jRI'},'|',true,false,true,false)
 ```
+<br>
 
 The final result provided a clearer picture for the objective of the command: 
-![](Pasted%20image%2020260228200307.png)
+![](attachments/Pasted%20image%2020260228200307.png)
+
+<br>
 
 Following .Replace() in the obfuscated code, the URL corresponds to `hxxp[://]144[.]172[.]100[.]220/img/optimized_MSI[.]png`, which appears to download a file named `Name_File` in the C:\Users\Public\Downloads folder. Upon further deconstruction of the encoding, this is confirmed:
-![](Pasted%20image%2020260228201656.png)
+<br>
 
+![](attachments/Pasted%20image%2020260228201656.png)
+
+<br>
 Further investigation through VirusTotal shows that the URL is from a known "`highly sophisticated RAT"
 
-![](Pasted%20image%2020260228195744.png)
+<br>
+
+![](attachments/Pasted%20image%2020260228195744.png)
+
+<br>
 
 Query to find more information into `name_file.js`
-![](Pasted%20image%2020260228203108.png)
+<br>
+
+![](attachments/Pasted%20image%2020260228203108.png)
+
+<br>
 
 `Query to search for events regarding name_file.js`
+
 ```KQL
 union DeviceEvents, DeviceFileEvents, DeviceProcessEvents, SecurityAlert, AlertEvidence
 | where * has "Name_File.js"
@@ -41,15 +61,29 @@ union DeviceEvents, DeviceFileEvents, DeviceProcessEvents, SecurityAlert, AlertE
 | project-reorder TimeGenerated, AccountName, ProcessCommandLine
 ```
 
-![](Pasted%20image%2020260228205517.png)
+<br>
+
+![](attachments/Pasted%20image%2020260228205517.png)
+
+<br>
 
 At this point, it would be time to escalate the issue to SOC level 2 as it is clear that the obfuscated Powershell command reached out to a known malicious url to download a file. Furthermore, after downloading the file another Powershell command was used to silently gain persistence onto the system. In my professional opinion, the Desktop should be quarantined from the rest of the network so that any malicious processes/scheduled tasks can be removed.
+<br>
+
 ### Root Cause Analysis
 First and foremost, I want to see when the SOC-Administrator account started exhibiting abnormal behavior. The initial suspicious events occurred around 02-28 12:12:54 UTC time. By looking at the timeline on Defender alerts, we see a suspicious login from an external address. 
-![](Pasted%20image%2020260228232550.png)
+
+![](attachments/Pasted%20image%2020260228232550.png)
+
+<br>
 
 Next, querying virus total gives the following results:
-![](Pasted%20image%2020260228232820.png)
+
+<br>
+
+![](attachments/Pasted%20image%2020260228232820.png)
+
+<br>
 
 It is unclear whether or not the IP address is malicious in nature as it appears to be a VPN located in the UK. Further investigation is needed. However mere seconds afterwards, the remote session initiator IP of 192.168.112.129 is established.  To obtain a better look into the events that took place after the connection 192.168.112.129 initiated, the following query was executed:
 
@@ -62,10 +96,18 @@ AlertEvidence
 | sort by TimeGenerated desc
 ```
 
-![](Pasted%20image%2020260228213527.png)
+<br>
+
+![](attachments/Pasted%20image%2020260228213527.png)
+
+<br>
 
 The same commands that were observed in the initial investigation appear. I decided to look up the PID of the alert to observe if it spawned any processes. The parent process id is located in the `AdditionalFields` section, therefore needs to be parsed.
-![](Pasted%20image%2020260228160351.png)
+<br>
+
+![](attachments/Pasted%20image%2020260228160351.png)
+
+<br>
 
 `Querying to view spawned processes from the powershell instances`
 ```KQL
@@ -94,8 +136,11 @@ AlertEvidene
 | where Account == "SOC-Administrator"
 ```
 
-![](Pasted%20image%2020260228164600.png)
+<br>
 
+![](attachments/Pasted%20image%2020260228164600.png)
+
+<br>
 
 ```KQL
 AlertEvidence
@@ -108,7 +153,11 @@ AlertEvidence
 | project TimeGenerated, Account, ProcessCommandLine
 ```
 
-![](Pasted%20image%2020260228183109.png)
+<br>
+
+![](attachments/Pasted%20image%2020260228183109.png)
+
+<br>
 
 Upon detection, 
 `Query for all tables containg the javascript file`
@@ -126,11 +175,22 @@ union DeviceProcessEvents, DeviceFileEvents, DeviceProcessEvents, DeviceNetworkE
 | project-reorder TimeGenerated, Type, ProcessCommandLine, FileName
 ```
 
-![](Pasted%20image%2020260301134540.png)
+<br>
+
+![](attachments/Pasted%20image%2020260301134540.png)
+
+<br>
 
 Upon acquiring the file hash of New Purchaee Order 00045757.js, it was determined that the file is malicious. 
-![](Pasted%20image%2020260301134954.png)
+<br>
+
+![](attachments/Pasted%20image%2020260301134954.png)
+
+<br>
 
 Looking into events that preceded this file do not indicate that the file was downloaded from the web or an email attachment. Further investigation shows no indication of when the file originated, but the abnormal behavior where Desktop-2 reached out to the malicious domain happened after the interaction with the malicious file. This is a lab environment and files are discarded after 30 days, which may be the cause resulting in lack of telemetry for the origination of the file. Regardless, New Purchaee Order appears to be patient zero!
+<br>
 
-![](Pasted%20image%2020260301141409.png)
+![](attachments/Pasted%20image%2020260301141409.png)
+
+<br>
