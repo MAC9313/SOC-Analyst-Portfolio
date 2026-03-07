@@ -12,7 +12,7 @@ I am transitioning from a tenured career in construction into the cybersecurity 
 
 I created this space to demonstrate my commitment to continuous technical growth and to provide a transparent look at my problem-solving process. Whether I am analyzing Splunk logs or hunting for C2 persistence, I am dedicated to maintaining high-integrity documentation and a relentless curiosity for the unusual.
 
-View my featured lab write-ups below to see my investigative approach in action.
+View my featured lab write-ups to see my investigative approach in action.
 
 
 
