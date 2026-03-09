@@ -296,3 +296,91 @@ Finally, another Slack application is added to receive the notification that the
 
 </details>
 
+<details>
+  
+<summary><B>(Bonus) Certificate Authority Setup For LDAPS</B></summary>
+<br>
+
+In the Shuffler.io workflow, LDAP was used to authenticate to the Active Directory app. To make access to the Domain Controller more secure, the implementation of LDAPS would be optimal. To do that, we need to set up a Certificate Authority in Active Directory.
+
+Just to be clear that the following exercise is not best practice, but is a demonstration of how to set up Active Directory Certificate Services. A root certificate should not be installed on the Domain Controller. In fact, it should not even be a part of the domain.
+
+In this exercise, the Domain controller is set up as the `Root` and the vultr-guest.CyberDefender.local machine will be set up as the `Subordinate` certificate authority that will connect to the Root authority. The following images depict how the guest machine is added to the Root authority and set up to implement LDAPS on port 636. 
+
+The following steps depict setting up the Subordinate Authority as the Root has already been set up. The steps for setting up Root in the Server Manager are the same, besides the selection for Root. 
+
+<br>
+
+`In Server Manager, Add Active Directory Certificate Services`
+
+![](./Attachments/Pasted%20image%2020260309113322.png)
+
+![](./Attachments/Pasted%20image%2020260309115317.png)
+
+<br>
+
+`Create A New Private Key With The Following Specs`
+
+![](./Attachments/Pasted%20image%2020260309115152.png)
+
+<br>
+
+In this case, the parent domain is the Domain Controller, which is what we're wanting to connect to. Again, the Domain Controller should not be set up as the Root authority.
+
+![](./Attachments/Pasted%20image%2020260309115511.png)
+
+![](./Attachments/Pasted%20image%2020260309115742.png)
+
+<br>
+
+`On The DC, The Connection To The Subordinate Authority Is Successful`
+
+![](./Attachments/Pasted%20image%2020260309120017.png)
+
+<br>
+
+`On The Guest Machine, Add Duplicate Kerberos Authentication To Templates`
+
+![](./Attachments/Pasted%20image%2020260309121914.png)
+
+![](./Attachments/Pasted%20image%2020260309122513.png)
+
+<br>
+
+`On The DC, Use MMC.exe To Add The Certificate Plug-In`
+
+<br>
+
+![](./Attachments/Pasted%20image%2020260309123358.png)
+
+![](./Attachments/Pasted%20image%2020260309123608.png)
+
+![](./Attachments/Pasted%20image%2020260309124025.png)
+
+<br> 
+
+`Through LDP.exe, Check That The Connection TO LDAPS Is Successful`
+
+![](./Attachments/Pasted%20image%2020260309124857.png)
+
+<br>
+
+`Create A Group Policy Enforcing LDAPS`
+
+![](./Attachments/Pasted%20image%2020260309125946.png)
+
+<br>
+
+Require signing for `Domain controller: LDAP server signing requirements` and `Network security: Client signing requirements`
+
+![](./Attachments/Pasted%20image%2020260309130625.png)
+
+<br>
+
+Next, authenticate through Active Directory on Shuffler.io to use LDAPS. Run the workflow to verify that Shuffler is able to communicate to the Domain through port 636.
+
+![](./Attachments/Pasted%20image%2020260309143415.png)
+
+![](./Attachments/Pasted%20image%2020260309143640.png)
+
+</details>
