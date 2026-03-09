@@ -188,10 +188,14 @@ index="cyberdefender-ad" EventCode=4624 (Logon_Type=7 OR Logon_Type=10) Source_N
   
   At `shuffler.io`, start off by creating a workflow.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260303135943.png)
 
 
 Add a webhook and copy the url into the previously made alert on Splunk.
+
+<br>
 
 ![](./Attachments/Pasted%20image%2020260303153852.png)
 
@@ -199,14 +203,24 @@ Add a webhook and copy the url into the previously made alert on Splunk.
 
 After saving the alert, starting the webhook on shuffle will begin to ingest alerts that are created by Splunk.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260303155415.png)
+
+<br>
 
 A Slack account is needed to proceed with the next step and a workflow needs to be added in https://slack.com.  After Slack was added to the workflow, there was a problem authenticating with OAuth. Therefore, the workaround was creating an app using the following steps.
 1. While logged into Slack, navigate to https://api.slack.com/apps/ and create a new app
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260303170836.png)
 
+<br>
+
 2. Use the Client ID and the Client Secret with the scope set as `chat:write` and `channel:read` to get the redirect link needed to authenticate. Note that it is bad security hygiene to reveal a secret key, but this is for a test project and the key was regenerated before posting to github.  
+
+<br>
 
 ![](./Attachments/Pasted%20image%2020260303171144.png)
 
@@ -216,12 +230,21 @@ A Slack account is needed to proceed with the next step and a workflow needs to 
 
 3. In `OAuth and Permissions,` use the link in the error message and add the redirect link. Add `channels:read` and `chat:write` to the scope.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260303171852.png)
 
+<br>
+
 4. Proceed to login.
+
+<br>
+
 ![](./Attachments/Pasted%20image%2020260303172600.png)
 
 After authentication, created a new channel in Slack called alerts, which will receive the alerts from the webhook that is connected to Splunk. It is important to add the Slack app to the channel where the notifications are desired. Next insert the channel name into the Slack app on Shuffle.
+
+<br>
 
 ![](./Attachments/Pasted%20image%2020260305142925.png)
 
@@ -229,21 +252,35 @@ After authentication, created a new channel in Slack called alerts, which will r
 
 Next, run the workflow with Splunk webhook and Shuffle(Alert Generation) connected. After, insert the desired alert contents in the text parameters on shuffle using the autocomplete text function. Finally, begin the workflow and alerts should be generated to the alerts channel on Slack.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260305143739.png)
 
 ![](./Attachments/Pasted%20image%2020260305144307.png)
 
 Next the User Input action is put into the shuffle workflow to send an email to the SOC analyst when an alert is generated.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260305150010.png)
 
 ![](./Attachments/Pasted%20image%2020260307013046.png)
 
+<br>
+
 Next, the Active Directory app is added to the workflow. There was a problem with  authenticating to the domain as there was a network failure. It turned out the issue had to do with Shuffle not being able to connect to the AD Domain that is behind the VPC. Just to not that port 389 must be able to receive inbound traffic. 
+
+Just to note, the creation of a dedicated SVC_CYBERDEFENDER user account was created in Active Directory. This is a normal user account with privileges to disable accounts and reset passwords. 
+
+<br>
+
+![](./Attachments/Pasted%20image%2020260309151838.png)
 
 ![](./Attachments/Pasted%20image%2020260307112037.png)
 
-Therefore, Docker was installed and the VPC address was set up so the bridge knows which network interface to use for internal traffic.
+<br> 
+
+To correct the authentication issue, Docker was installed and the VPC address was set up so the bridge knows which network interface to use for internal traffic.
 
 **1. Install Docker**
 ```Bash
@@ -267,7 +304,11 @@ Next, in Shuffles admin section, create a location and acquire the Docker comman
 
 **4. Run the Orborus Container** Replace `YOUR_AUTH_KEY` and `YOUR_ORG_ID` with the values generated when you create a new "Location" in the Shuffle Cloud UI.
 
+<br> 
+
 ![](./Attachments/Pasted%20image%2020260307111208.png)
+
+<br>
 
 **5. Verify the Handshake** Wait 20 seconds, then check that the tunnel is open.
 
@@ -279,16 +320,25 @@ docker logs -f shuffle-orborus
 
 It is important to note that the Shuffle workflow must be in the newly created location for the connection to Active Directory to be successful. The current workflow is in the following illustration.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260307012456.png)
+
+<br>
 
 After executing the workflow, the User Action will send an email and wait for the user response before disabling the user. Copy the True link from the email into a browser and confirm the execution by clicking continue.
 
+<br>
+
 ![](./Attachments/Pasted%20image%2020260307013342.png)
 
+<br>
 
 ![](./Attachments/Pasted%20image%2020260307105840.png)
 
 Finally, another Slack application is added to receive the notification that the Active Directory account is disabled. Rerunning the workflow results in Slack receiving the notification. 
+
+<br>
 
 ![](./Attachments/Pasted%20image%2020260307104158.png)
 
