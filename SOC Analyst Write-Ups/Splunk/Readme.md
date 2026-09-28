@@ -1,6 +1,6 @@
 ## Splunk: SIEM Operations & Threat Hunting
 
- This directory documents my process in using Splunk for security monitoring, incident triage, and forensic reconstruction. The projects within demonstrate a transition from high-level alerts to root-cause analysis using Search Processing Language (SPL).
+ This directory documents my process in using Splunk for security monitoring, incident triage, and forensic reconstruction. The projects within demonstrate a transition from high-level alerts to root-cause analysis using Search Processing Language (SPL). Take note that the more complex, robust queries that are used were crafted with assistance from AI and were validated in the lab environment. AI is used as a tool to assist in investigations, it is still critical to know the behavior/action that the query is aiming to identify and how to pivot off of findings. 
 
 ### Technical Core Competencies
 
