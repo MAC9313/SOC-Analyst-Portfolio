@@ -1,6 +1,6 @@
 ## Cybersecurity Graduate | Aspiring SOC Analyst
 
-I am transitioning from a tenured career in construction into the cybersecurity field, bringing a no-fail mindset and technical discipline to digital defense. I recently completed my B.S. in Cybersecurity and Information Assurance at WGU, focusing on building an investigative mindset through rigorous lab work and industry certifications like CompTIA CySA+ and PenTest+.
+I am a Cybersecurity graduate and IT Service Desk Analyst for a fortune 500 company aspiring to become a security analyst. I have dedicated myself to a lifetime of learning and am looking for an organization that will give me the opportunity to prove myself in a security focused role. 
 
 `Technical Immersion & Methodology:`
 
